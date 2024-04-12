@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interfaccia/index</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #000; /* Sfondo nero */
+      color: #fff; /* Testo bianco */
+    }
+    .container {
+      display: flex;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      background-color: #121212; /* Grigio molto scuro per il container */
+    }
+    .column {
+      flex: 1;
+      padding: 10px;
+    }
+    .left-column {
+      border-right: 1px solid #333;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #4aa0e6; /* Colore blu chiaro per titoli */
+    }
+    button {
+      margin-top: 10px;
+      padding: 8px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    form {
+      margin-top: 20px;
+    }
+    form label {
+      display: block;
+      margin-bottom: 5px;
+      color: #ccc; /* Colore del testo per le etichette */
+    }
+    form input[type="text"],
+    form input[type="number"],
+    form input[type="date"],
+    form input[type="email"] {
+      width: calc(100% - 20px);
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #333;
+      border-radius: 4px;
+      background-color: #222; /* Grigio molto scuro per gli input */
+      color: #fff; /* Testo bianco per gli input */
+      box-sizing: border-box;
+    }
+    #output {
+      padding: 10px;
+      border: 1px solid #333;
+      border-radius: 4px;
+      background-color: #222;
+      color: #fff;
+    }
+    .error {
+      color: #ff5555;
+      margin-top: 5px;
+    }
+    .menu-buttons {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .menu-buttons button {
+      margin: 0 10px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="column left-column">
+      <div class="menu-buttons">
+        <button onclick="showForm('getDataForm')">DATA METHOD</button>
+        <button onclick="showForm('addDataForm')">ADD METHOD</button>
+        <button onclick="showForm('updateDataForm')">UPDATE METHOD</button>
+        <button onclick="showForm('deleteDataForm')">DELETE METHOD</button>
+      </div>
+      <div id="getDataForm" class="form-container">
+        <form>
+          <h2>GET METHOD</h2>
+          <label for="id">ID:</label>
+          <input type="number" id="id" name="id" min="1">
+          <button type="button" onclick="getDataById()">GET</button>
+        </form>
+      </div>
+      <div id="addDataForm" class="form-container hidden">
+        <form>
+          <h2>ADD METHOD</h2>
+          <label for="addNome">NAME:</label>
+          <input type="text" id="addNome" name="nome" required>
+          <label for="addCognome">SURNAME:</label>
+          <input type="text" id="addCognome" name="cognome" required>
+          <label for="addEmail">EMAIL:</label>
+          <input type="email" id="addEmail" name="email" required>
+          <label for="addEta">AGE:</label>
+          <input type="number" id="addEta" name="eta" min="1" required>
+          <label for="addDataIscrizione">SUBSCRIPTION DATE:</label>
+          <input type="date" id="addDataIscrizione" name="data_iscrizione" required>
+          <button type="button" onclick="addData()">ADD</button>
+        </form>
+      </div>
+      <div id="updateDataForm" class="form-container hidden">
+        <form>
+          <h2>UPDATE METHOD</h2>
+          <label for="updateId">ID:</label>
+          <input type="number" id="updateId" name="id" min="1">
+          <label for="updateNome">NAME:</label>
+          <input type="text" id="updateNome" name="nome">
+          <label for="updateCognome">SURNAME:</label>
+          <input type="text" id="updateCognome" name="cognome">
+          <label for="updateEmail">EMAIL:</label>
+          <input type="email" id="updateEmail" name="email">
+          <label for="updateEta">AGE:</label>
+          <input type="number" id="updateEta" name="eta" min="1">
+          <label for="updateDataIscrizione">SUBSCRIPTION DATE:</label>
+          <input type="date" id="updateDataIscrizione" name="data_iscrizione">
+          <button type="button" onclick="updateDataById()">UPDATE</button>
+        </form>
+      </div>
+      <div id="deleteDataForm" class="form-container hidden">
+        <form>
+          <h2>DELETE METHOD</h2>
+          <label for="deleteId">ID:</label>
+          <input type="number" id="deleteId" name="id" min="1">
+          <button type="button" onclick="deleteDataById()">DELETE</button>
+        </form>
+      </div>
+    </div>
+    <div class="column">
+      <h1>RESULTS</h1>
+      <div id="output"></div>
+    </div>
+  </div>
+
+  <script>
+    // Funzioni del client JavaScript
+    async function makeRequest(method, url, data = null) {
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: data ? JSON.stringify(data) : null
+        });
+        const responseData = await response.json();
+        return responseData;
+      } catch (error) {
+        console.error('Errore nella richiesta:', error);
+        throw error;
+      }
+    }
+
+    function showForm(formId) {
+      const forms = document.querySelectorAll('.form-container');
+      forms.forEach(form => {
+        if (form.id === formId) {
+          form.classList.remove('hidden');
+        } else {
+          form.classList.add('hidden');
+        }
+      });
+    }
+
+    async function getDataById() {
+      const id = document.getElementById('id').value;
+      try {
+        const response = await makeRequest('GET', `//${id}`);
+        displayOutput(JSON.stringify(response));
+      } catch (error) {
+        displayOutput('Errore nel recupero del dato.', true);
+      }
+    }
+
+    async function addData() {
+      const nome = document.getElementById('addNome').value;
+      const cognome = document.getElementById('addCognome').value;
+      const email = document.getElementById('addEmail').value;
+      const eta = document.getElementById('addEta').value;
+      const dataIscrizione = document.getElementById('addDataIscrizione').value;
+      const data = { nome, cognome, email, eta, data_iscrizione: dataIscrizione };
+      try {
+        const response = await makeRequest('POST', '/', data);
+        displayOutput('Dato aggiunto con successo: ' + JSON.stringify(response));
+      } catch (error) {
+        displayOutput('Errore durante l\'aggiunta del dato.', true);
+      }
+    }
+
+    async function updateDataById() {
+      const id = document.getElementById('updateId').value;
+      const nome = document.getElementById('updateNome').value;
+      const cognome = document.getElementById('updateCognome').value;
+      const email = document.getElementById('updateEmail').value;
+      const eta = document.getElementById('updateEta').value;
+      const dataIscrizione = document.getElementById('updateDataIscrizione').value;
+      const data = { nome, cognome, email, eta, data_iscrizione: dataIscrizione };
+      try {
+        const response = await makeRequest('PUT', `//${id}`, data);
+        displayOutput('Dato aggiornato con successo: ' + JSON.stringify(response));
+      } catch (error) {
+        displayOutput('Errore durante l\'aggiornamento del dato.', true);
+      }
+    }
+
+    async function deleteDataById() {
+      const id = document.getElementById('deleteId').value;
+      try {
+        const response = await makeRequest('DELETE', `//${id}`);
+        displayOutput('Dato eliminato con successo: ' + JSON.stringify(response));
+      } catch (error) {
+        displayOutput('Errore durante l\'eliminazione del dato.', true);
+      }
+    }
+
+    function displayOutput(message, isError = false) {
+      const outputDiv = document.getElementById('output');
+      outputDiv.innerHTML = `<p class="${isError ? 'error' : ''}">${message}</p>`;
+    }
+  </script>
+</body>
+</html>
