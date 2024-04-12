@@ -19,9 +19,9 @@ $array = explode('/',$_SERVER['REQUEST_URI']);
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method == 'GET') {
-    if (count($array) == 3 && $array[2] != '') {
+    if (count($array) == 4 && $array[3] != '') {
         // Se è specificato un ID nella richiesta GET
-        $id = $array[2];
+        $id = $array[3];
         $sql = "SELECT * FROM dati WHERE id = $id";
         $result = $conn->query($sql);
         
@@ -31,7 +31,7 @@ if ($method == 'GET') {
         } else {
             echo "Nessun risultato trovato con ID $id";
         }
-    } elseif (count($array) == 3 && $array[2] == '') {
+    } elseif (count($array) == 4 && $array[3] == '') {
         // Se non è specificato un ID nella richiesta GET
         $sql = "SELECT * FROM dati";
         $result = $conn->query($sql);
@@ -74,8 +74,8 @@ if ($method == 'GET') {
     $data = json_decode(file_get_contents("php://input"), true);
     
     // Verifica se l'ID è stato fornito
-    if (count($array) == 3 && $array[2] != '') {
-        $id = $array[2];
+    if (count($array) == 4 && $array[3] != '') {
+        $id = $array[3];
         
         // Esegui l'aggiornamento nel database
         $sql = "UPDATE dati SET nome=?, cognome=?, email=?, eta=?, data_iscrizione=? WHERE id=?";
@@ -92,8 +92,8 @@ if ($method == 'GET') {
     }
 } elseif ($method == 'DELETE') {
     // Esegui la cancellazione dei dati
-    if (count($array) == 3 && $array[2] != '') {
-        $id = $array[2];
+    if (count($array) == 4 && $array[3] != '') {
+        $id = $array[3];
         
         // Esegui la cancellazione nel database
         $sql = "DELETE FROM dati WHERE id=?";
