@@ -224,6 +224,8 @@ td:hover {
     clearInputs();
   }
 
+
+
   function addData() {
     var data = {
       nome: document.getElementById("nome").value,
@@ -261,9 +263,10 @@ td:hover {
     xhr.onreadystatechange = function() {
         if (this.readyState == 4) {
             if (this.status == 200) {
+                clearInputs();
                 document.getElementById("response").innerHTML = formatResponse(translateHTTPCode(this.status));
             } else {
-                document.getElementById("response").innerHTML = formatResponse(translateHTTPCode(this.status));
+                document.getElementById("response").innerHTML = formatResponse(translateHTTPCode(this.status));           
             }
         }
     };
@@ -308,12 +311,13 @@ td:hover {
             for (var key in data[0]) {
                 table += "<th>" + key + "</th>";
             }
-            table += "</tr></thead><tbody>";
+            table += "<th>Actions</th></tr></thead><tbody>";
             data.forEach(function(item) {
                 table += "<tr>";
                 for (var key in item) {
                     table += "<td>" + item[key] + "</td>";
                 }
+                table += "<td><button onclick=\"populateUpdateForm(" + item.id + ")\">UPDATE</button></td>";
                 table += "</tr>";
             });
             table += "</tbody></table>";
@@ -331,7 +335,29 @@ td:hover {
     } catch (error) {
         return response;
     }
-  }
+}
+
+function populateUpdateForm(id) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                var data = JSON.parse(this.responseText);
+                document.getElementById("updateId").value = data.id;
+                document.getElementById("updateNome").value = data.nome;
+                document.getElementById("updateCognome").value = data.cognome;
+                document.getElementById("updateEmail").value = data.email;
+                document.getElementById("updateEta").value = data.eta;
+                document.getElementById("updateDataIscrizione").value = data.data_iscrizione;
+                showForm('updateDataForm'); // Mostra il form di aggiornamento
+            } else {
+                document.getElementById("response").innerHTML = translateHTTPCode(this.status);
+            }
+        }
+    };
+    xhr.open("GET", "index.php/" + id, true);
+    xhr.send();
+}
 
   function translateHTTPCode(code) {
     var translations = {
