@@ -88,6 +88,30 @@
   .hidden {
       display: none;
   }
+/* Stile per la tabella */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* Intestazione della tabella */
+th {
+    padding: 10px;
+    border: 1px solid #fff; /* Aggiunta del bordo bianco */
+}
+
+/* Celle della tabella */
+td {
+    padding: 10px;
+    border: 1px solid #fff; /* Aggiunta del bordo bianco */
+}
+
+/* Hover sulle celle */
+td:hover {
+    background-color: #555;
+}
+
 </style>
 </head>
 <body>
@@ -166,6 +190,7 @@
         } else {
           form.classList.add('hidden');
         }
+        document.getElementById("response").innerHTML = formatResponse("");
       });
     }
 
@@ -250,13 +275,37 @@
     }
 
     function formatResponse(response) {
-        try {
-            var data = JSON.parse(response);
+    try {
+        var data = JSON.parse(response);
+        if (Array.isArray(data) && data.length > 0) {
+            var table = "<table><thead><tr>";
+            for (var key in data[0]) {
+                table += "<th>" + key + "</th>";
+            }
+            table += "</tr></thead><tbody>";
+            data.forEach(function(item) {
+                table += "<tr>";
+                for (var key in item) {
+                    table += "<td>" + item[key] + "</td>";
+                }
+                table += "</tr>";
+            });
+            table += "</tbody></table>";
+            return table;
+        } else if (typeof data === 'object' && data !== null) {
+            var table = "<table><tbody>";
+            for (var key in data) {
+                table += "<tr><th>" + key + "</th><td>" + data[key] + "</td></tr>";
+            }
+            table += "</tbody></table>";
+            return table;
+        } else {
             return JSON.stringify(data, null, 2);
-        } catch (error) {
-            return response;
         }
+    } catch (error) {
+        return response;
     }
+}
 </script>
 
 </body>
